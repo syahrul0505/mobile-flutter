@@ -1,3 +1,6 @@
+import 'package:ecommerce/model/cart_item.dart';
+import 'package:ecommerce/model/category.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:badges/badges.dart' as custom_badge;
 import 'package:ecommerce/model/product.dart';
@@ -5,16 +8,47 @@ import 'package:ecommerce/routes/app_routes.dart';
 import 'package:ecommerce/screens/detail_screen.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:ecommerce/network/api.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   Future<List<MenuItem>> fetchMenuItems() async {
-    final response = await http.get(Uri.parse('https://saja-siji.jooal.pro/api/tokoonline/resto'));
+    final response = await Network().getData('/api/tokoonline/resto');
 
     if (response.statusCode == 200) {
       List jsonResponse = json.decode(response.body);
       return jsonResponse.map((item) => MenuItem.fromJson(item)).toList();
+    } else {
+      throw Exception('Failed to load menu items');
+    }
+  }
+
+  Future<List<CategoryProduct>> fetchCategories() async {
+    final response = await Network().getData('/api/tokoonline/category');
+
+    if (response.statusCode == 200) {
+      List jsonResponse = json.decode(response.body);
+      return jsonResponse
+          .map((item) => CategoryProduct.fromJson(item))
+          .toList();
+    } else {
+      throw Exception('Failed to load categories');
+    }
+  }
+
+  Future<List<MenuItem>> fetchMenuItemsByCategory(int categoryId) async {
+    final response = await Network().getData('/api/tokoonline/resto');
+
+    if (response.statusCode == 200) {
+      List jsonResponse = json.decode(response.body);
+
+      return jsonResponse
+          .map((item) => MenuItem.fromJson(item))
+          .where((element) => element.categoryId == categoryId)
+          .toList();
     } else {
       throw Exception('Failed to load menu items');
     }
@@ -33,50 +67,43 @@ class HomeScreen extends StatelessWidget {
               const SizedBox(height: 16),
               _buildBalanceSection(),
               const SizedBox(height: 16),
-              _buildSectionTitle(context, 'MENU RESTAURANT'),
-              FutureBuilder<List<MenuItem>>(
-                future: fetchMenuItems(),
+              FutureBuilder<List<CategoryProduct>>(
+                future: fetchCategories(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const CircularProgressIndicator();
                   } else if (snapshot.hasError) {
                     return Text('Error: ${snapshot.error}');
                   } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return const Text('No items found');
+                    return const Text('No categories found');
                   } else {
-                    return _buildMenuSlider(context, snapshot.data!);
-                  }
-                },
-              ),
-              const SizedBox(height: 16),
-              _buildSectionTitle(context, 'DESSERT'),
-              FutureBuilder<List<MenuItem>>(
-                future: fetchMenuItems(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const CircularProgressIndicator();
-                  } else if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
-                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return const Text('No items found');
-                  } else {
-                    return _buildMenuSlider(context, snapshot.data!);
-                  }
-                },
-              ),
-              const SizedBox(height: 16),
-              _buildSectionTitle(context, 'MINUMAN'),
-              FutureBuilder<List<MenuItem>>(
-                future: fetchMenuItems(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const CircularProgressIndicator();
-                  } else if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
-                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return const Text('No items found');
-                  } else {
-                    return _buildMenuSlider(context, snapshot.data!);
+                    return Column(
+                      children: snapshot.data!.map((category) {
+                        return Column(
+                          children: [
+                            _buildSectionTitle(context, category.name),
+                            FutureBuilder<List<MenuItem>>(
+                              future: fetchMenuItemsByCategory(category.id),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return const CircularProgressIndicator();
+                                } else if (snapshot.hasError) {
+                                  return Text('Error: ${snapshot.error}');
+                                } else if (!snapshot.hasData ||
+                                    snapshot.data!.isEmpty) {
+                                  return const Text('No items found');
+                                } else {
+                                  return _buildMenuSlider(
+                                      context, snapshot.data!);
+                                }
+                              },
+                            ),
+                            const SizedBox(height: 20),
+                          ],
+                        );
+                      }).toList(),
+                    );
                   }
                 },
               ),
@@ -88,7 +115,8 @@ class HomeScreen extends StatelessWidget {
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Beranda'),
           BottomNavigationBarItem(icon: Icon(Icons.history), label: 'Riwayat'),
-          BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: 'Pesanan'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.shopping_cart), label: 'Pesanan'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profil'),
         ],
         selectedItemColor: const Color(0xFF164863),
@@ -118,7 +146,8 @@ class HomeScreen extends StatelessWidget {
         const SizedBox(width: 16),
         custom_badge.Badge(
           position: custom_badge.BadgePosition.topEnd(top: 0, end: 3),
-          badgeContent: const Text('99+', style: TextStyle(color: Colors.white, fontSize: 8)),
+          badgeContent: const Text('99+',
+              style: TextStyle(color: Colors.white, fontSize: 8)),
           child: IconButton(
             icon: const Icon(Icons.notifications, color: Colors.white),
             onPressed: () {},
@@ -127,7 +156,15 @@ class HomeScreen extends StatelessWidget {
         const SizedBox(width: 16),
         custom_badge.Badge(
           position: custom_badge.BadgePosition.topEnd(top: 0, end: 3),
-          badgeContent: const Text('99+', style: TextStyle(color: Colors.white, fontSize: 8)),
+          badgeContent: Consumer<Cart>(
+            builder: (context, cart, _) {
+              int itemCount = cart.items.length;
+              return Text(
+                itemCount > 99 ? '99+' : itemCount.toString(),
+                style: TextStyle(color: Colors.white, fontSize: 8),
+              );
+            },
+          ),
           child: IconButton(
             icon: const Icon(Icons.shopping_cart, color: Colors.white),
             onPressed: () {
@@ -137,7 +174,8 @@ class HomeScreen extends StatelessWidget {
         ),
         const SizedBox(width: 16),
         CircleAvatar(
-          backgroundImage: NetworkImage('https://via.placeholder.com/150'),
+          backgroundImage:
+              NetworkImage('https://ui-avatars.com/api/?name=Imam+Syaraf'),
         ),
       ],
     );
@@ -187,8 +225,10 @@ class HomeScreen extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(title, style: const TextStyle(color: Colors.white, fontSize: 18)),
-          Text('Lihat Semua', style: TextStyle(color: Colors.white.withOpacity(0.7))),
+          Text(title,
+              style: const TextStyle(color: Colors.white, fontSize: 18)),
+          Text('Lihat Semua',
+              style: TextStyle(color: Colors.white.withOpacity(0.7))),
         ],
       ),
     );
@@ -196,7 +236,7 @@ class HomeScreen extends StatelessWidget {
 
   Widget _buildMenuSlider(BuildContext context, List<MenuItem> items) {
     return SizedBox(
-      height: 250,
+      height: 280,
       child: PageView.builder(
         controller: PageController(viewportFraction: 0.8),
         itemCount: items.length,
@@ -225,7 +265,8 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           children: [
             ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(10)),
               child: Image.network(
                 item.image,
                 fit: BoxFit.cover,
@@ -248,11 +289,19 @@ class HomeScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(item.name, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+                  Text(item.name,
+                      style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white)),
                   const SizedBox(height: 4),
-                  Text('Stock: ${item.currentStock ?? 'N/A'}', style: const TextStyle(fontSize: 12, color: Color(0xFFFACA15))), // Updated color
+                  Text('Stock: ${item.currentStock ?? 'N/A'}',
+                      style: const TextStyle(
+                          fontSize: 12,
+                          color: Color(0xFFFACA15))), // Updated color
                   const SizedBox(height: 4),
-                  Text(item.sellingPrice, style: const TextStyle(fontSize: 14, color: Colors.red)),
+                  Text(item.sellingPrice,
+                      style: const TextStyle(fontSize: 14, color: Colors.red)),
                   const SizedBox(height: 8),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -266,14 +315,17 @@ class HomeScreen extends StatelessWidget {
                               builder: (context) => DetailScreen(item: {
                                 'name': item.name,
                                 'image': item.image,
-                                // 'description': item.description,
+                                'description': item.description,
+                                'id': item.id.toString(),
+                                'selling_price': item.sellingPrice,
                               }),
                             ),
                           );
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.orange,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10)),
                         ),
                         child: const Text('Detail'),
                       ),
@@ -286,14 +338,17 @@ class HomeScreen extends StatelessWidget {
                               builder: (context) => DetailScreen(item: {
                                 'name': item.name,
                                 'image': item.image,
-                                // 'description': item.description,
+                                'description': item.description,
+                                'id': item.id.toString(),
+                                'selling_price': item.sellingPrice,
                               }),
                             ),
                           );
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.blue,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10)),
                         ),
                         child: const Text('Add to Cart'),
                       ),

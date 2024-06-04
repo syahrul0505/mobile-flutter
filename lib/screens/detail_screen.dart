@@ -1,7 +1,9 @@
+import 'package:ecommerce/model/cart_item.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class DetailScreen extends StatelessWidget {
-  final Map<String, String> item;
+  final Map<String, String?> item;
 
   const DetailScreen({super.key, required this.item});
 
@@ -23,7 +25,7 @@ class DetailScreen extends StatelessWidget {
               const SizedBox(height: 16),
               _buildMenuDetail(context),
               const SizedBox(height: 16),
-              _buildCheckOutButton(),
+              _buildCheckOutButton(context),
             ],
           ),
         ),
@@ -32,7 +34,8 @@ class DetailScreen extends StatelessWidget {
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Beranda'),
           BottomNavigationBarItem(icon: Icon(Icons.history), label: 'Riwayat'),
-          BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: 'Pesanan'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.shopping_cart), label: 'Pesanan'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profil'),
         ],
         selectedItemColor: const Color(0xFF164863),
@@ -115,12 +118,14 @@ class DetailScreen extends StatelessWidget {
           const SizedBox(height: 16),
           const Text(
             'DETAIL – MENU MAKANAN',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+            style: TextStyle(
+                fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
           ),
           const SizedBox(height: 8),
           Text(
             item['name']!,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.grey),
+            style: const TextStyle(
+                fontSize: 16, fontWeight: FontWeight.bold, color: Colors.grey),
           ),
           const SizedBox(height: 8),
           Text(
@@ -134,10 +139,35 @@ class DetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCheckOutButton() {
+  Widget _buildCheckOutButton(BuildContext context) {
     return ElevatedButton(
       onPressed: () {
         // Handle checkout button press
+        final cart = Provider.of<Cart>(context, listen: false);
+        cart.addItem(
+          int.parse(item['id']!),
+          item['name']!,
+          item['image']!,
+          double.parse(item['selling_price']!),
+        );
+
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: const Text('Success'),
+              content: const Text('Item added to cart.'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
       },
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.orange, // Button color
@@ -147,7 +177,7 @@ class DetailScreen extends StatelessWidget {
       ),
       child: const Padding(
         padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-        child: Text('CHECK OUT'),
+        child: Text('Add To Cart'),
       ),
     );
   }

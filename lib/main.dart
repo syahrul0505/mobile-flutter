@@ -1,8 +1,15 @@
+import 'package:ecommerce/model/cart_item.dart';
 import 'package:flutter/material.dart';
 import 'routes/app_routes.dart'; // Ensure the correct import path
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => Cart(),
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
