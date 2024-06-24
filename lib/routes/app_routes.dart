@@ -1,3 +1,4 @@
+import 'package:ecommerce/screens/detail_transaksi.dart';
 import 'package:flutter/material.dart';
 import '../screens/login_screen.dart'; // Import the login screen
 import '../screens/home_screen.dart'; // Import the home screen
@@ -9,6 +10,7 @@ class AppRoutes {
   static const String home = '/home';
   static const String detail = '/detail';
   static const String cart = '/cart';
+  static const String transaction = '/transaction';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -21,6 +23,8 @@ class AppRoutes {
       case detail:
         final item = settings.arguments as Map<String, String>;
         return MaterialPageRoute(builder: (_) => DetailScreen(item: item));
+      case transaction:
+        return MaterialPageRoute(builder: (_) => const DetailTransaksiScreen());
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(

@@ -133,6 +133,15 @@ class HomeScreen extends StatelessWidget {
         selectedItemColor: const Color(0xFF164863),
         unselectedItemColor: Colors.grey,
         backgroundColor: Colors.white,
+        onTap: (index) {
+          print("index");
+          print(index);
+          switch (index) {
+            case 2:
+              Navigator.pushNamed(context, AppRoutes.transaction);
+              break;
+          }
+        },
       ),
     );
   }
