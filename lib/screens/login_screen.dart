@@ -52,7 +52,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 TextField(
                   controller: emailController,
                   decoration: const InputDecoration(
-                    prefixIcon: Icon(Icons.email, color: Color.fromARGB(255, 68, 68, 68)),
+                    prefixIcon: Icon(Icons.email,
+                        color: Color.fromARGB(255, 68, 68, 68)),
                     hintText: 'Email / Username',
                     hintStyle: TextStyle(color: Color(0xFF575757)),
                     filled: true,
@@ -69,7 +70,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   controller: passwordController,
                   obscureText: _obscureText,
                   decoration: InputDecoration(
-                    prefixIcon: const Icon(Icons.lock, color: Color.fromARGB(255, 68, 68, 68)),
+                    prefixIcon: const Icon(Icons.lock,
+                        color: Color.fromARGB(255, 68, 68, 68)),
                     suffixIcon: IconButton(
                       icon: Icon(
                         _obscureText ? Icons.visibility : Icons.visibility_off,
@@ -101,7 +103,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       checkColor: const Color(0xFF164863),
                       fillColor: MaterialStateProperty.all(Colors.white),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(4.0), // Set the desired border radius here
+                        borderRadius: BorderRadius.circular(
+                            4.0), // Set the desired border radius here
                       ),
                     ),
                     const Text(
@@ -128,7 +131,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           (element) =>
                               element.name == emailController.text &&
                               element.email == passwordController.text,
-                          orElse: () => User(id: 0, name: '', email: '', password: ''),
+                          orElse: () =>
+                              User(id: 0, name: '', email: '', password: ''),
                         );
 
                         print(user.id);
@@ -143,14 +147,16 @@ class _LoginScreenState extends State<LoginScreen> {
                           prefs.setString('name', user.name);
                           prefs.setString('email', user.email);
 
-                          Navigator.pushReplacementNamed(context, AppRoutes.home);
+                          Navigator.pushReplacementNamed(
+                              context, AppRoutes.home);
                         } else {
                           showDialog(
                             context: context,
                             builder: (context) {
                               return AlertDialog(
                                 title: const Text('Error'),
-                                content: const Text('Invalid email or password'),
+                                content:
+                                    const Text('Invalid email or password'),
                                 actions: [
                                   TextButton(
                                     onPressed: () {
@@ -169,8 +175,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           builder: (context) {
                             return AlertDialog(
                               title: const Text('Error'),
-                              content:
-                                  const Text('API Error, please try again later'),
+                              content: const Text(
+                                  'API Error, please try again later'),
                               actions: [
                                 TextButton(
                                   onPressed: () {
@@ -187,8 +193,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF0766AD),
                       foregroundColor: Colors.white,
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 50, vertical: 15),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),

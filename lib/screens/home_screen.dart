@@ -283,7 +283,8 @@ class HomeScreen extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: const [
-                      Text('Rp 1.000.000', style: TextStyle(color: Colors.black)),
+                      Text('Rp 1.000.000',
+                          style: TextStyle(color: Colors.black)),
                       Text('Isi Saldo', style: TextStyle(color: Colors.grey)),
                     ],
                   ),
@@ -336,7 +337,7 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _buildMenuSlider(BuildContext context, List<MenuItem> items) {
-  return Padding(
+    return Padding(
       padding: const EdgeInsets.only(top: 16, bottom: 20),
       child: Align(
         alignment: Alignment.topLeft,
@@ -354,7 +355,7 @@ class HomeScreen extends StatelessWidget {
         ),
       ),
     );
-}
+  }
 
   Widget _buildMenuItem(BuildContext context, MenuItem item) {
     return Padding(
@@ -376,7 +377,8 @@ class HomeScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(12)),
               child: Image.network(
                 item.image,
                 fit: BoxFit.cover,
@@ -409,8 +411,7 @@ class HomeScreen extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text('Stock: ${item.currentStock ?? 'N/A'}',
                           style: const TextStyle(
-                              fontSize: 14,
-                              color: Color(0xFFFACA15))),
+                              fontSize: 14, color: Color(0xFFFACA15))),
                       const SizedBox(height: 4),
                       Text(item.sellingPrice,
                           style: const TextStyle(
@@ -440,9 +441,12 @@ class HomeScreen extends StatelessWidget {
                               backgroundColor: Colors.orange,
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10)),
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 12),
                             ),
-                            child: const Text('Detail', style: TextStyle(fontSize: 14, color: Colors.white)),
+                            child: const Text('Detail',
+                                style: TextStyle(
+                                    fontSize: 14, color: Colors.white)),
                           ),
                           ElevatedButton(
                             onPressed: () {
@@ -463,9 +467,12 @@ class HomeScreen extends StatelessWidget {
                               backgroundColor: Colors.blue,
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10)),
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 12),
                             ),
-                            child: const Text('Add to Cart', style: TextStyle(fontSize: 14, color: Colors.white)),
+                            child: const Text('Add to Cart',
+                                style: TextStyle(
+                                    fontSize: 14, color: Colors.white)),
                           ),
                         ],
                       ),

@@ -6,7 +6,7 @@ class MenuItem {
   final String purchasePrice;
   final String sellingPrice;
   final String status;
-  final String? currentStock;
+  final int? currentStock;
   final String image;
   final String? description;
   final String? slug;

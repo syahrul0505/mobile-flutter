@@ -52,4 +52,13 @@ class Cart extends ChangeNotifier {
   double get totalPrice {
     return _items.fold(0, (total, item) => total + item.price * item.quantity);
   }
+
+  void clear() {
+    _items = [];
+    notifyListeners();
+  }
+
+  int get totalItems {
+    return _items.fold(0, (total, item) => total + item.quantity);
+  }
 }

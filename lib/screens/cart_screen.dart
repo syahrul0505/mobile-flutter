@@ -1,4 +1,5 @@
 import 'package:ecommerce/model/cart_item.dart';
+import 'package:ecommerce/network/api.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart'; // Add this import statement
@@ -67,8 +68,64 @@ class CartScreen extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () {
-                // Handle payment button press
+              onPressed: () async {
+                const url = '/api/checkout';
+                final cart = Provider.of<Cart>(context, listen: false);
+                final data = {
+                  'qty': cart.totalItems,
+                  'totalPrice': cart.totalPrice + (cart.totalPrice * 10 / 100),
+                  'subTotal': cart.totalPrice,
+                  'items': cart.items
+                      .map((item) => {
+                            'name': item.name,
+                            'quantity': item.quantity,
+                            'price_discount': item.price,
+                          })
+                      .toList(),
+                };
+
+                final response = await Network().postData(data, url);
+
+                if (response.statusCode == 200) {
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: const Text('Success'),
+                        content: const Text('Payment success'),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                              cart.clear();
+                            },
+                            child: const Text('OK'),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                } else {
+                  print(response.body);
+                  print(response.statusCode);
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: const Text('Error'),
+                        content: const Text('Payment failed'),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text('OK'),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.orange,
