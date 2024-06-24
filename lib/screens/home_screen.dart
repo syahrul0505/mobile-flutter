@@ -59,55 +59,66 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFF164863),
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              _buildSearchBar(context),
-              const SizedBox(height: 16),
-              _buildBalanceSection(),
-              const SizedBox(height: 16),
-              FutureBuilder<List<CategoryProduct>>(
-                future: fetchCategories(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const CircularProgressIndicator();
-                  } else if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
-                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return const Text('No categories found');
-                  } else {
-                    return Column(
-                      children: snapshot.data!.map((category) {
-                        return Column(
-                          children: [
-                            _buildSectionTitle(context, category.name),
-                            FutureBuilder<List<MenuItem>>(
-                              future: fetchMenuItemsByCategory(category.id),
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return const CircularProgressIndicator();
-                                } else if (snapshot.hasError) {
-                                  return Text('Error: ${snapshot.error}');
-                                } else if (!snapshot.hasData ||
-                                    snapshot.data!.isEmpty) {
-                                  return const Text('No items found');
-                                } else {
-                                  return _buildMenuSlider(
-                                      context, snapshot.data!);
-                                }
-                              },
-                            ),
-                            const SizedBox(height: 20),
-                          ],
-                        );
-                      }).toList(),
-                    );
-                  }
-                },
-              ),
-            ],
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Color(0xFF123456), Colors.black],
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                _buildSearchBar(context),
+                const SizedBox(height: 16),
+                _buildCarouselWidget(),
+                const SizedBox(height: 16),
+                _buildBalanceSection(),
+                const SizedBox(height: 16),
+                FutureBuilder<List<CategoryProduct>>(
+                  future: fetchCategories(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const CircularProgressIndicator();
+                    } else if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return const Text('No categories found');
+                    } else {
+                      return Column(
+                        children: snapshot.data!.map((category) {
+                          return Column(
+                            children: [
+                              _buildSectionTitle(context, category.name),
+                              FutureBuilder<List<MenuItem>>(
+                                future: fetchMenuItemsByCategory(category.id),
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return const CircularProgressIndicator();
+                                  } else if (snapshot.hasError) {
+                                    return Text('Error: ${snapshot.error}');
+                                  } else if (!snapshot.hasData ||
+                                      snapshot.data!.isEmpty) {
+                                    return const Text('No items found');
+                                  } else {
+                                    return _buildMenuSlider(
+                                        context, snapshot.data!);
+                                  }
+                                },
+                              ),
+                              const SizedBox(height: 20),
+                            ],
+                          );
+                        }).toList(),
+                      );
+                    }
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -175,52 +186,142 @@ class HomeScreen extends StatelessWidget {
         const SizedBox(width: 16),
         CircleAvatar(
           backgroundImage:
-              NetworkImage('https://ui-avatars.com/api/?name=Imam+Syaraf'),
+              NetworkImage('https://ui-avatars.com/api/?name=Syahrul+Alif'),
         ),
       ],
+    );
+  }
+
+  Widget _buildCarouselWidget() {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFF123456), // Adjust to match the background color
+        borderRadius: BorderRadius.circular(10),
+      ),
+      margin: const EdgeInsets.all(5.0), // Margin around the widget
+      child: Stack(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: Image.asset(
+              'assets/desert.png', // Replace with your image URL or asset
+              width: double.infinity,
+              height: 150,
+              fit: BoxFit.cover,
+            ),
+          ),
+          Positioned(
+            bottom: 8,
+            left: 0,
+            right: 0,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 8,
+                  height: 8,
+                  margin: const EdgeInsets.symmetric(horizontal: 2),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white,
+                  ),
+                ),
+                Container(
+                  width: 8,
+                  height: 8,
+                  margin: const EdgeInsets.symmetric(horizontal: 2),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white,
+                  ),
+                ),
+                Container(
+                  width: 8,
+                  height: 8,
+                  margin: const EdgeInsets.symmetric(horizontal: 2),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildBalanceSection() {
-    return Row(
-      children: [
-        Expanded(
-          child: Container(
-            padding: const EdgeInsets.all(16.0),
-            decoration: BoxDecoration(
-              color: const Color(0xFF98BEC8),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Column(
-              children: const [
-                Text('Rp 1.000.000', style: TextStyle(color: Colors.white)),
-                Text('Isi Saldo', style: TextStyle(color: Colors.white)),
-              ],
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFFE8F5F8),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      padding: const EdgeInsets.all(8.0), // Added padding to container
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          IconButton(
+            icon: Icon(Icons.qr_code_scanner, color: Colors.grey),
+            onPressed: () {
+              // Handle scanner button press
+            },
+          ),
+          Container(
+            width: 1,
+            height: 50,
+            color: Colors.grey[300],
+          ),
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                children: [
+                  Icon(Icons.account_balance_wallet, color: Colors.grey),
+                  const SizedBox(width: 8),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: const [
+                      Text('Rp 1.000.000', style: TextStyle(color: Colors.black)),
+                      Text('Isi Saldo', style: TextStyle(color: Colors.grey)),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Container(
-            padding: const EdgeInsets.all(16.0),
-            decoration: BoxDecoration(
-              color: const Color(0xFF98BEC8),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Column(
-              children: const [
-                Text('50.000', style: TextStyle(color: Colors.white)),
-                Text('Koin', style: TextStyle(color: Colors.white)),
-              ],
+          Container(
+            width: 1,
+            height: 50,
+            color: Colors.grey[300],
+          ),
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                children: [
+                  Icon(Icons.monetization_on, color: Colors.grey),
+                  const SizedBox(width: 8),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: const [
+                      Text('50.000', style: TextStyle(color: Colors.black)),
+                      Text('Koin', style: TextStyle(color: Colors.grey)),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
   Widget _buildSectionTitle(BuildContext context, String title) {
-    return Padding(
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16.0),
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -235,25 +336,34 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _buildMenuSlider(BuildContext context, List<MenuItem> items) {
-    return SizedBox(
-      height: 280,
-      child: PageView.builder(
-        controller: PageController(viewportFraction: 0.8),
-        itemCount: items.length,
-        itemBuilder: (context, index) {
-          return _buildMenuItem(context, items[index]);
-        },
+  return Padding(
+      padding: const EdgeInsets.only(top: 16, bottom: 20),
+      child: Align(
+        alignment: Alignment.topLeft,
+        child: Container(
+          height: 280,
+          child: ListView(
+            shrinkWrap: false,
+            scrollDirection: Axis.horizontal,
+            children: [
+              SizedBox(width: 16),
+              ...items.map((item) => _buildMenuItem(context, item)).toList(),
+              SizedBox(width: 16),
+            ],
+          ),
+        ),
       ),
     );
-  }
+}
 
   Widget _buildMenuItem(BuildContext context, MenuItem item) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      padding: const EdgeInsets.only(right: 12.0, bottom: 8.0),
       child: Container(
+        width: 250,
         decoration: BoxDecoration(
-          color: const Color(0xFF164863), // Matching parent background color
-          borderRadius: BorderRadius.circular(10),
+          color: const Color(0xFF1E2A38),
+          borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.1),
@@ -263,10 +373,10 @@ class HomeScreen extends StatelessWidget {
           ],
         ),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ClipRRect(
-              borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(10)),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
               child: Image.network(
                 item.image,
                 fit: BoxFit.cover,
@@ -284,77 +394,85 @@ class HomeScreen extends StatelessWidget {
                 },
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(item.name,
-                      style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white)),
-                  const SizedBox(height: 4),
-                  Text('Stock: ${item.currentStock ?? 'N/A'}',
-                      style: const TextStyle(
-                          fontSize: 12,
-                          color: Color(0xFFFACA15))), // Updated color
-                  const SizedBox(height: 4),
-                  Text(item.sellingPrice,
-                      style: const TextStyle(fontSize: 14, color: Colors.red)),
-                  const SizedBox(height: 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            Flexible(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      ElevatedButton(
-                        onPressed: () {
-                          // Handle detail action
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => DetailScreen(item: {
-                                'name': item.name,
-                                'image': item.image,
-                                'description': item.description,
-                                'id': item.id.toString(),
-                                'selling_price': item.sellingPrice,
-                              }),
+                      Text(item.name,
+                          style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white)),
+                      const SizedBox(height: 4),
+                      Text('Stock: ${item.currentStock ?? 'N/A'}',
+                          style: const TextStyle(
+                              fontSize: 14,
+                              color: Color(0xFFFACA15))),
+                      const SizedBox(height: 4),
+                      Text(item.sellingPrice,
+                          style: const TextStyle(
+                              fontSize: 16,
+                              color: Colors.red,
+                              fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 12),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => DetailScreen(item: {
+                                    'name': item.name,
+                                    'image': item.image,
+                                    'description': item.description,
+                                    'id': item.id.toString(),
+                                    'selling_price': item.sellingPrice,
+                                  }),
+                                ),
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.orange,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10)),
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                             ),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.orange,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10)),
-                        ),
-                        child: const Text('Detail'),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          // Navigate to detail screen with item details
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => DetailScreen(item: {
-                                'name': item.name,
-                                'image': item.image,
-                                'description': item.description,
-                                'id': item.id.toString(),
-                                'selling_price': item.sellingPrice,
-                              }),
+                            child: const Text('Detail', style: TextStyle(fontSize: 14, color: Colors.white)),
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => DetailScreen(item: {
+                                    'name': item.name,
+                                    'image': item.image,
+                                    'description': item.description,
+                                    'id': item.id.toString(),
+                                    'selling_price': item.sellingPrice,
+                                  }),
+                                ),
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blue,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10)),
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                             ),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10)),
-                        ),
-                        child: const Text('Add to Cart'),
+                            child: const Text('Add to Cart', style: TextStyle(fontSize: 14, color: Colors.white)),
+                          ),
+                        ],
                       ),
+                      const SizedBox(height: 8),
                     ],
                   ),
-                ],
+                ),
               ),
             ),
           ],
